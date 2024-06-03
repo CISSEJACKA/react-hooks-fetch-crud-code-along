@@ -1,36 +1,62 @@
-import React, { useState } from "react";
-import ItemForm from "./ItemForm";
-import Filter from "./Filter";
-import Item from "./Item";
+// src/components/ShoppingList.js
+import React, { useState } from 'react';
 
-function ShoppingList() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+const ShoppingList = () => {
   const [items, setItems] = useState([]);
+  const [itemName, setItemName] = useState('');
+  const [category, setCategory] = useState('Produce');
 
-  function handleCategoryChange(category) {
-    setSelectedCategory(category);
-  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!itemName.trim()) return;
+    setItems([...items, { name: itemName, category }]);
+    setItemName('');
+  };
 
-  const itemsToDisplay = items.filter((item) => {
-    if (selectedCategory === "All") return true;
-
-    return item.category === selectedCategory;
-  });
+  const handleDelete = (index) => {
+    setItems(items.filter((_, i) => i !== index));
+  };
 
   return (
     <div className="ShoppingList">
-      <ItemForm />
-      <Filter
-        category={selectedCategory}
-        onCategoryChange={handleCategoryChange}
-      />
+      <form className="NewItem" onSubmit={handleSubmit}>
+        <label>
+          Name:
+          <input
+            name="name"
+            type="text"
+            value={itemName}
+            onChange={(e) => setItemName(e.target.value)}
+          />
+        </label>
+        <label>
+          Category:
+          <select name="category" value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="Produce">Produce</option>
+            <option value="Dairy">Dairy</option>
+            <option value="Dessert">Dessert</option>
+          </select>
+        </label>
+        <button type="submit">Add to List</button>
+      </form>
+      <div className="Filter">
+        <select name="filter">
+          <option value="All">Filter by category</option>
+          <option value="Produce">Produce</option>
+          <option value="Dairy">Dairy</option>
+          <option value="Dessert">Dessert</option>
+        </select>
+      </div>
       <ul className="Items">
-        {itemsToDisplay.map((item) => (
-          <Item key={item.id} item={item} />
+        {items.map((item, index) => (
+          <li key={index}>
+            {item.name} - {item.category}
+            <button onClick={() => handleDelete(index)}>Delete</button>
+          </li>
         ))}
       </ul>
     </div>
   );
-}
+};
 
 export default ShoppingList;
